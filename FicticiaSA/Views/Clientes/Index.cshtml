@@ -1,0 +1,255 @@
+﻿﻿@{
+    ViewData["Title"] = "Clientes";
+}
+
+
+
+<div class="card shadow">
+    <div class="card-body">
+
+        <div class="d-flex justify-content-between align-items-center"><h2>Listado de clientes</h2><a class="btn btn-success" title="Agregar cliente" onclick="AbrirModal()"><i class="fa-solid fa-plus"></i></a></div>
+
+        <hr>
+
+        <div class="row">
+            <div class="form-group col-md-3">
+                <select id="EstadoID" class="form-control mt-3 mb-3">
+                    <option value="0" selected>ESTADOS DE LOS CLIENTES</option>
+                    <option value="1">ACTIVOS</option>
+                    <option value="2">INACTIVOS</option>
+                </select>
+            </div>
+
+            <div class="form-group col-md-4 inputbuscar">
+                <div>  <input type="search" class="form-control mt-3 mb-3" placeholder="BUSCAR POR NOMBRE O DNI" name="buscar" id="buscar-input" onkeyup="this.value = this.value.toUpperCase()" oninput="BuscarClientes(this.value)"> </div>
+            </div>
+
+        </div>
+
+        <div style="height:60vh; overflow: auto">
+            <table id="table-clientes" class="table table-striped table-bordered ">
+                <thead class="table-dark">
+                    <tr style="color:white; font-size:16px;">
+                        <th>
+                            Nombre completo
+                        </th>
+                        <th class="text-center">
+                            D.N.I
+                        </th>
+                        <th class="text-center">
+                            Edad
+                        </th>
+                        <th class="text-center">
+                            Género
+                        </th>
+                        <th class="text-center">
+                            Estado
+                        </th>
+                        <th class="text-center">
+                            Atributos adicionales
+                        </th>
+                        <th class="tablaOpciones text-center">
+                            Opciones
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody id="tbody-clientes">
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+
+
+<!-- MODAL PARA CREAR O EDITAR UN CLIENTE -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="tituloModal"></h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+
+                
+                <form>
+
+                    <input type="hidden" id="ClienteID" value="0" />
+
+
+                    <div class="accordion" id="accordionExample">
+
+                        @* Parte uno carga de datos del cliente *@
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingOne">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                                    Datos del cliente
+                                </button>
+                            </h2>
+                            <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+
+
+                                    <div class="form-group">
+                                        <label class="control-label  mb-3" for="Nombre">  Nombre completo: <span class="text-danger">(*)</span></label>
+                                        <input type="text" class="form-control" id="Nombre" autocomplete="off" onkeyup="this.value = this.value.toUpperCase()" placeholder="INGRESE EL NOMBRE COMPLETO" required />
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="control-label  mt-3 mb-3" for="dni">  DNI: <span class="text-danger">(*)</span></label>
+                                        <input type="text" class="form-control" id="dni" autocomplete="off" placeholder="INGRESE EL DNI" required maxlength="10" oninput="formatearDNI(this)" />
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="control-label  mt-3 mb-3" for="Edad">  Edad: <span class="text-danger">(*)</span></label>
+                                        <input type="number" class="form-control" id="Edad" autocomplete="off" placeholder="INGRESE LA EDAD" required oninput="limitarEdad(this)" />
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="control-label  mt-3 mb-3" for="Genero">Género: <span class="text-danger">(*)</span></label>
+                                        <select id="Genero" name="Genero" class="form-control">
+                                            <option value="0" selected>SELECCIONE EL GÉNERO</option>
+                                            <option value="1">HOMBRE</option>
+                                            <option value="2">MUJER</option>
+                                            <option value="3">NO BINARIO</option>
+                                            <option value="4">OTRO</option>
+                                            <option value="5">PREFIERO NO DECIRLO</option>
+                                        </select>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <label class="control-label  mt-3 mb-3" for="Estado">Estado: <span class="text-danger">(*)</span></label>
+                                        <select id="Estado" name="Estado" class="form-control" disabled>
+                                            <option value="0" selected>SELECCIONE EL ESTADO</option>
+                                            <option value="1">ACTIVO</option>
+                                            <option value="2">INACTIVO</option>
+                                        </select>
+                                    </div>
+
+                                
+                                </div>
+                            </div>
+                        </div>
+
+
+                        @* Parte dos carga de atributos adicionales del cliente *@
+
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingTwo">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    Atributos adicionales
+                                </button>
+                            </h2>
+                            <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+                                <div class="accordion-body">
+
+                                    <div class="form-group">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="Maneja">
+                                        <label class="form-check-label" for="Maneja">¿Conduce vehículos?</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="Fuma">
+                                        <label class="form-check-label" for="Fuma">¿Consume tabaco?</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="UsaLentes">
+                                        <label class="form-check-label" for="UsaLentes">¿Utiliza lentes?</label>
+                                    </div>
+
+
+                                    <div class="form-group">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="Diabetes">
+                                        <label class="form-check-label" for="Diabetes">¿Padece de diabetes?</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <input class="form-check-input" type="checkbox" role="switch" id="Enfermedad" onchange="habilitarEnfermedad()">
+                                        <label class="form-check-label" for="Enfermedad">¿Padece alguna enfermedad?</label>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label  mt-3 mb-3" for="DescripcionEnfermerdad">¿Qué enfermedad? </label>
+                                        <input type="text" class="form-control" id="DescripcionEnfermerdad" autocomplete="off" placeholder="ESPECIFIQUE LA ENFERMEDA QUE PADECE" required disabled />
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <p class="text-danger font-weight-bold mt-3 mb-3" style="font-size:small" id="ErrorCliente"></p>
+
+                </form>
+
+            </div>
+            <div class="modal-footer">
+
+                <button type="button" onclick="VaciarModal()" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i> Cerrar</button>
+
+                <button type="button" onclick="GuardarCliente()" class="btn btn-success"><i class="fa-regular fa-bookmark"></i> Guardar</button>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- ES EL MODAL QUE MUESTRA LOS ATRIBUTOS -->
+
+<div class="modal fade" id="modalAtributos" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="tituloModalAtributo"></h1>
+            </div>
+            <div class="modal-body">
+
+                <div class="row mb-2">
+                    <div class="text-right"><i class="fa-solid fa-caret-right"></i> <b>¿Conduce? </b> <span id="MA-Conduce"></span> </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="text-right"><i class="fa-solid fa-caret-right"></i> <b>¿Tiene el hábito de fumar? </b> <span id="MA-Fuma"></span> </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="text-right"><i class="fa-solid fa-caret-right"></i> <b>¿Usa lentes? </b> <span id="MA-Lentes"></span> </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="text-right"><i class="fa-solid fa-caret-right"></i> <b>¿Sufre de diabetes? </b> <span id="MA-Diabete"></span> </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="text-right"><i class="fa-solid fa-caret-right"></i> <b>¿Padece alguna enfermedad? </b> <span id="MA-Enfermedad"></span> </div>
+                </div>
+
+                <div class="row mb-2">
+                    <div class="text-right"><i class="fa-solid fa-caret-right"></i> <b>¿Cuál? </b> <span id="MA-TipoEnfermedad"></span> </div>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="VaciarModalAtributos()" class="btn btn-danger" data-bs-dismiss="modal"><i class="fa-solid fa-xmark"></i>  Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/Cliente.js"></script>
+}
